@@ -5,6 +5,7 @@ NodeJS Driver for Snowflake
   <a href="https://github.com/snowflakedb/snowflake-connector-nodejs/actions?query=workflow%3A%22Build+and+Test%22+branch%3Amaster" target="_blank"><img src="https://github.com/snowflakedb/snowflake-connector-nodejs/workflows/Build%20and%20Test/badge.svg?branch=master" alt="master" /></a>
   <a href="https://www.npmjs.com/package/snowflake-sdk" target="_blank"><img src="https://img.shields.io/npm/v/snowflake-sdk.svg" alt="npm" /></a> 
   <a href="http://www.apache.org/licenses/LICENSE-2.0.txt" target="_blank"><img src="http://img.shields.io/:license-Apache%202-brightgreen.svg" alt="apache" /> </a>
+  <a href="https://codecov.io/gh/snowflakedb/snowflake-connector-nodejs" target="_blank"><img src="https://codecov.io/gh/snowflakedb/snowflake-connector-nodejs/branch/master/graph/badge.svg?token=QZMWDu35ds" alt="codecov" /></a>
 </p>
 
 
@@ -14,19 +15,7 @@ NodeJS Driver for Snowflake
 Install
 ======================================================================
 
-Include ``snowflake-sdk`` in ``dependencies`` section in ``package.json``
-```
-{
-  "name": "<your_application_name>",
-  "version": "<your_application_version>",
-  "dependencies": {
-    "...": "...",        
-    "snowflake-sdk": "^1.6.22",
-    "...": "..."
-  }
-}
-```
-And run the <code>npm install</code>
+Run `npm i snowflake-sdk` in your existing NodeJs project.
 
 Docs
 ======================================================================
@@ -68,7 +57,7 @@ npm test
 ```
 or
 ```
-npm test:unit
+npm run test:unit
 ```
 
 To run single test file use `test:single` script, e.g. run tests in `test/unit/snowflake_test.js` only:
@@ -79,7 +68,26 @@ npm run test:single -- test/unit/snowflake_test.js
 
 Run integration tests:
 ```
-npm test:integration
+npm run test:integration
+```
+
+Manual test
+----------------------------------------------------------------------
+
+Specify env variables:
+
+```
+export RUN_MANUAL_TESTS_ONLY=true
+export SNOWFLAKE_TEST_OKTA_USER=<your_okta_user>
+export SNOWFLAKE_TEST_OKTA_PASS=<your_okta_password>
+export SNOWFLAKE_TEST_OKTA_AUTH=<your_okta_auth>
+export SNOWFLAKE_TEST_OAUTH_TOKEN=<your_oauth_accesstoken>
+export SNOWFLAKE_TEST_BROWSER_USER=<your_browser_user>
+```
+
+Run manual connection test for different authenticators
+```
+npm run test:manual
 ```
 
 Getting the code coverage
