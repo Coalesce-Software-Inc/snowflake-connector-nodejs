@@ -18,6 +18,8 @@ var connectionOptionsDeserialize = mockConnectionOptions.deserialize;
 var connectionOptionsServiceName = mockConnectionOptions.serviceName;
 var connectionOptionsClientSessionKeepAlive = mockConnectionOptions.clientSessionKeepAlive;
 var connectionOptionsForSessionGone = mockConnectionOptions.sessionGone;
+var connectionOptionsExternalBrowser = mockConnectionOptions.authExternalBrowser;
+var connectionOptionsOkta = mockConnectionOptions.authOkta;
 const connectionOptionsFor504 = mockConnectionOptions.http504;
 const connectionOptionsTreatIntegerAsBigInt = mockConnectionOptions.treatIntAsBigInt;
 
@@ -257,6 +259,21 @@ describe('snowflake.createConnection() synchronous errors', function ()
             proxyPort: 'proxyPort'
           },
         errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_PROXY_PORT
+      },
+      {
+        name: 'invalid row mode',
+        options:
+          {
+            username: 'username',
+            password: 'password',
+            account: 'account',
+            warehouse: 'warehouse',
+            database: 'database',
+            schema: 'schema',
+            role: 'role',
+            rowMode: 'unknown'
+          },
+        errorCode: ErrorCodes.ERR_STMT_STREAM_ROWS_INVALID_ROW_MODE
       }
     ];
 
@@ -441,6 +458,44 @@ describe('connection.connect() asynchronous errors', function ()
       {
         done();
       });
+  });
+
+  it('connect() with external browser authenticator', function (done)
+  {
+    // create a connection and connect with external browser
+    var connection = snowflake.createConnection(connectionOptionsExternalBrowser);
+
+    // try to connect
+    try
+    {
+      connection.connect();
+    }
+    catch (err)
+    {
+      assert.ok(err);
+      assert.strictEqual(
+        err.code, ErrorCodes.ERR_CONN_CREATE_INVALID_AUTH_CONNECT);
+      done();
+    }
+  });
+
+  it('connect() with okta authenticator', function (done)
+  {
+    // create a connection and connect with okta
+    var connection = snowflake.createConnection(connectionOptionsOkta);
+
+    // try to connect
+    try
+    {
+      connection.connect();
+    }
+    catch (err)
+    {
+      assert.ok(err);
+      assert.strictEqual(
+        err.code, ErrorCodes.ERR_CONN_CREATE_INVALID_AUTH_CONNECT);
+      done();
+    }
   });
 });
 
@@ -658,37 +713,14 @@ function testStatementFetchRows(statement)
         errorCode: ErrorCodes.ERR_STMT_FETCH_ROWS_MISSING_END
       },
       {
-        name: 'fetchRows() undefined end()',
+        name: 'fetchRows() row mode invalid',
         options:
           {
-            each: function ()
-            {
-            },
-            end: undefined
+            each: function () {},
+            end: function () {},
+            rowMode: 'invalid'
           },
-        errorCode: ErrorCodes.ERR_STMT_FETCH_ROWS_MISSING_END
-      },
-      {
-        name: 'fetchRows() null end()',
-        options:
-          {
-            each: function ()
-            {
-            },
-            end: null
-          },
-        errorCode: ErrorCodes.ERR_STMT_FETCH_ROWS_MISSING_END
-      },
-      {
-        name: 'fetchRows() invalid end()',
-        options:
-          {
-            each: function ()
-            {
-            },
-            end: ''
-          },
-        errorCode: ErrorCodes.ERR_STMT_FETCH_ROWS_INVALID_END
+        errorCode: ErrorCodes.ERR_STMT_STREAM_ROWS_INVALID_ROW_MODE
       }
     ];
 

@@ -13,6 +13,7 @@ describe('GCS client', function ()
   var mockLocation = 'mockLocation';
   var mockTable = 'mockTable';
   var mockPath = 'mockPath';
+  var mockAccessToken = 'mockAccessToken';
   var mockClient = 'mockClient';
   var mockKey = 'mockKey';
   var mockIv = 'mockIv';
@@ -73,24 +74,24 @@ describe('GCS client', function ()
   {
     var GCS = new SnowflakeGCSUtil();
 
-    var result = GCS.extractBucketNameAndPath('sfc-dev1-regression/test_sub_dir/');
-    assert.strictEqual(result.bucketName, 'sfc-dev1-regression');
+    var result = GCS.extractBucketNameAndPath('sfc-eng-regression/test_sub_dir/');
+    assert.strictEqual(result.bucketName, 'sfc-eng-regression');
     assert.strictEqual(result.path, 'test_sub_dir/');
 
-    var result = GCS.extractBucketNameAndPath('sfc-dev1-regression/stakeda/test_stg/test_sub_dir/');
-    assert.strictEqual(result.bucketName, 'sfc-dev1-regression');
+    var result = GCS.extractBucketNameAndPath('sfc-eng-regression/stakeda/test_stg/test_sub_dir/');
+    assert.strictEqual(result.bucketName, 'sfc-eng-regression');
     assert.strictEqual(result.path, 'stakeda/test_stg/test_sub_dir/');
 
-    var result = GCS.extractBucketNameAndPath('sfc-dev1-regression/');
-    assert.strictEqual(result.bucketName, 'sfc-dev1-regression');
+    var result = GCS.extractBucketNameAndPath('sfc-eng-regression/');
+    assert.strictEqual(result.bucketName, 'sfc-eng-regression');
     assert.strictEqual(result.path, '');
 
-    var result = GCS.extractBucketNameAndPath('sfc-dev1-regression//');
-    assert.strictEqual(result.bucketName, 'sfc-dev1-regression');
+    var result = GCS.extractBucketNameAndPath('sfc-eng-regression//');
+    assert.strictEqual(result.bucketName, 'sfc-eng-regression');
     assert.strictEqual(result.path, '/');
 
-    var result = GCS.extractBucketNameAndPath('sfc-dev1-regression///');
-    assert.strictEqual(result.bucketName, 'sfc-dev1-regression');
+    var result = GCS.extractBucketNameAndPath('sfc-eng-regression///');
+    assert.strictEqual(result.bucketName, 'sfc-eng-regression');
     assert.strictEqual(result.path, '//');
   });
 
@@ -279,11 +280,35 @@ describe('GCS client', function ()
         return data;
       }
     });
+    mock('gcsClient', {
+      bucket: function (bucketName)
+      {
+        function bucket()
+        {
+          this.file = function (bucketPath)
+          {
+            function file()
+            {
+              this.save = function (fileStream, options)
+              {
+                let err = new Error();
+                err.code = 401;
+                throw err;
+              }
+            }
+            return new file;
+          }
+        }
+        return new bucket;
+      }
+    });
     httpclient = require('httpclient');
     filestream = require('filestream');
+    gcsClient = require('gcsClient');
     var GCS = new SnowflakeGCSUtil(httpclient, filestream);
 
     meta.presignedUrl = '';
+    meta.client = { gcsToken: mockAccessToken, gcsClient: gcsClient };
 
     await GCS.uploadFile(dataFile, meta, encryptionMetadata);
     assert.strictEqual(meta['resultStatus'], resultStatus.RENEW_TOKEN);

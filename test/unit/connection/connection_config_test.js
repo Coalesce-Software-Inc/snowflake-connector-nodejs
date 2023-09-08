@@ -35,10 +35,55 @@ describe('ConnectionConfig: basic', function ()
         errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
       },
       {
+        name: 'missing username with SNOWFLAKE authenticator',
+        options: 
+          { 
+            authenticator: 'SNOWFLAKE'
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
+      },
+      {
+        name: 'missing browser timeout with EXTERNALBROWSER authenticator',
+        options:
+          {
+            authenticator: 'EXTERNALBROWSER',
+            username: 'admin',
+            account: 'snowflake',
+            browserActionTimeout: -1
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_BROWSER_TIMEOUT
+      },
+      {
+        name: 'missing username with SNOWFLAKE_JWT authenticator',
+        options: 
+          { 
+            authenticator: 'SNOWFLAKE_JWT'
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
+      },
+      {
         name: 'undefined username',
         options:
           {
             username: undefined
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
+      },
+      {
+        name: 'undefined username with SNOWFLAKE authenticator',
+        options:
+          {
+            username: undefined,
+            authenticator: 'SNOWFLAKE'
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
+      },
+      {
+        name: 'undefined username with SNOWFLAKE_JWT authenticator',
+        options:
+          {
+            username: undefined,
+            authenticator: 'SNOWFLAKE_JWT'
           },
         errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
       },
@@ -51,10 +96,64 @@ describe('ConnectionConfig: basic', function ()
         errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
       },
       {
+        name: 'null username with SNOWFLAKE authenticator',
+        options:
+          {
+            username: null,
+            authenticator: 'SNOWFLAKE'
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
+      },
+      {
+        name: 'null username with SNOWFLAKE_JWT authenticator',
+        options:
+          {
+            username: null,
+            authenticator: 'SNOWFLAKE_JWT'
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_MISSING_USERNAME
+      },
+      {
         name: 'invalid username',
         options:
           {
             username: 0
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_USERNAME
+      },
+      {
+        name: 'invalid username with SNOWFLAKE authenticator',
+        options:
+          {
+            username: 0,
+            authenticator: 'SNOWFLAKE'
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_USERNAME
+      },
+      {
+        name: 'invalid username with OAUTH authenticator',
+        options:
+          {
+            username: 0,
+            authenticator: 'OAUTH'
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_USERNAME
+      },
+      {
+        name: 'invalid username with EXTERNALBROWSER authenticator',
+        options:
+          {
+            username: 0,
+            authenticator: 'EXTERNALBROWSER'
+          },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_USERNAME
+      },
+      {
+        name: 'invalid username with SNOWFLAKE_JWT authenticator',
+        options:
+          {
+            username: 0,
+            authenticator: 'SNOWFLAKE_JWT'
           },
         errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_USERNAME
       },
@@ -400,10 +499,21 @@ describe('ConnectionConfig: basic', function ()
           username: 'username',
           password: 'password',
           account: 'account',
-          application: 'abcdefghijklmnopABCDEFGHIJKLMNOP1234567890abcdefghijklmnopABCDEFGHIJKLMNOP1234567890'
+          application: '0123456789012345678901!%$##234567890123456789012345678901234567890'
         },
         errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_APPLICATION
-      }
+      },
+      {
+        name: 'invalid gcsUseDownscopedCredential',
+        options:
+        {
+          username: 'username',
+          password: 'password',
+          account: 'account',
+          gcsUseDownscopedCredential: 1234
+        },
+        errorCode: ErrorCodes.ERR_CONN_CREATE_INVALID_GCS_USE_DOWNSCOPED_CREDENTIAL
+      },
     ];
 
   var createNegativeITCallback = function (testCase)
@@ -693,6 +803,49 @@ describe('ConnectionConfig: basic', function ()
           accessUrl: 'https://account.snowflakecomputing.com',
           username: 'username',
           password: 'password'
+        }
+      },
+      {
+        name: 'gcsUseDownscopedCredential',
+        input:
+        {
+          username: 'username',
+          password: 'password',
+          account: 'account',
+          gcsUseDownscopedCredential: true
+        },
+        options:
+        {
+          accessUrl: 'https://account.snowflakecomputing.com',
+          username: 'username',
+          password: 'password'
+        }
+      },
+      {
+        name: 'oauth without username',
+        input:
+        {
+          account: 'account',
+          authenticator: 'OAUTH',
+          token: 'token'
+        },
+        options:
+        {
+          accessUrl: 'https://account.snowflakecomputing.com',
+          account: 'account'
+        }
+      },
+      {
+        name: 'external browser without username and password',
+        input:
+        {
+          account: 'account',
+          authenticator: 'EXTERNALBROWSER'
+        },
+        options:
+        {
+          accessUrl: 'https://account.snowflakecomputing.com',
+          account: 'account'
         }
       }
     ];
